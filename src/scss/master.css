@@ -45,7 +45,6 @@ body {
   font-weight: 300;
   background: var(--body-bg);
   height: 100vh;
-  overflow-x: hidden;
 }
 
 h1, h2, h3, h5, h6 {
@@ -112,7 +111,7 @@ a {
   left: 0;
   right: 0;
   bottom: 0;
-  overflow-y: hidden;
+  overflow-y: scroll;
   padding: 1em;
 }
 .page-content.no-pad {
