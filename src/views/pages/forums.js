@@ -43,7 +43,7 @@ class ForumView {
                             localStorage.setItem('postId', post._id);
 
                             // Redirect to the forumPost page
-                            window.location.href = `/forumPost`;
+                            gotoRoute(`/forumPost`);
                         });
 
     
