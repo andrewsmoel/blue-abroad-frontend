@@ -165,7 +165,6 @@ class HomeView {
     .page-content {
       padding-left: 20%;
       padding-right: 20%;
-      
     }
     
     .bento {

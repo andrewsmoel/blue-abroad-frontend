@@ -89,7 +89,7 @@ a {
   left: 0;
   right: 0;
   bottom: 0;
-  overflow-y: scroll;
+  overflow-y: hidden;
   padding: 1em;
   &.no-pad {
     padding: 0;
