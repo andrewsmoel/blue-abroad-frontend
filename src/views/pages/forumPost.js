@@ -15,7 +15,7 @@ class Comment {
         };
 
         // Fetch the post data from the server
-        const response = await fetch(`http://localhost:3000/comments`, {
+        const response = await fetch(`https://asmoel-blueabroad-backend.onrender.com/comments`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ class forumPostView {
 
     async getPostData(postId) {
         // Fetch the post data from the server
-        const response = await fetch(`http://localhost:3000/post/${postId}`, {
+        const response = await fetch(`https://asmoel-blueabroad-backend.onrender.com/post/${postId}`, {
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem('accessToken')
             }
@@ -51,7 +51,7 @@ class forumPostView {
         const postData = await response.json();
         console.log(postData.author);
         // Fetch the author's data from the server
-        const authorResponse = await fetch(`http://localhost:3000/user/${postData.author}`, {
+        const authorResponse = await fetch(`https://asmoel-blueabroad-backend.onrender.com/user/${postData.author}`, {
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem('accessToken')
             }

@@ -16,7 +16,7 @@ class ProfileView {
 
 
 postGetHandler(){
-  fetch('http://localhost:3000/post')
+  fetch('https://asmoel-blueabroad-backend.onrender.com/post')
     .then(response => response.json())
     .then(posts => {
       console.log('posts:', posts); // Log the posts
@@ -54,7 +54,7 @@ postGetHandler(){
                   localStorage.setItem('postId', post._id);
 
                   // Redirect to the forumPost page
-                  window.location.href = `http://localhost:1234/forumPost`;
+                  window.location.href = `https://andrewsmoel-blueabroad.netlify.app/forumPost`;
               });
                 
 

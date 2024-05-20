@@ -30,7 +30,7 @@ class newPostView {
         // Log the accessToken
         console.log("accessToken: ", localStorage.getItem('accessToken'));
         
-        fetch("http://localhost:3000/post", {
+        fetch("https://asmoel-blueabroad-backend.onrender.com/post", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
