@@ -53,7 +53,7 @@ class HomeView {
                     localStorage.setItem('postId', post._id);
 
                     // Redirect to the forumPost page
-                    gotoRoute = (`/forumPost`);
+                    gotoRoute(`/forumPost`);
                 });
                   
 
