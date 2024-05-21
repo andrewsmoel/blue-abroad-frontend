@@ -53,7 +53,7 @@ class HomeView {
                     localStorage.setItem('postId', post._id);
 
                     // Redirect to the forumPost page
-                    window.location.href = `https://andrewsmoel-blueabroad.netlify.app/forumPost`;
+                    gotoRoute = (`/forumPost`);
                 });
                   
 
