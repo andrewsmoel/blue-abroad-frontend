@@ -209,7 +209,7 @@ class EditProfileView {
                   <sl-input type="text" class="label-on-left" label="Email" name="email" value="${this.user.email}" placeholder="Email Address"></sl-input>
                 </div>
                 <div class="input-bio">
-                  <sl-textarea resize="auto" type="text" class="label-on-left" label="Bio" name="bio" value="${Auth.currentUser.bio}" placeholder="Tell us about yourself!"></sl-textarea>
+                  <sl-textarea resize="auto" type="text" class="label-on-left" label="Bio" name="bio" value="${this.user?.bio || ''}" placeholder="Tell us about yourself!"></sl-textarea>
                 </div>                   
                 <div class="input-avatar">    
                   ${(this.user.avatar) ? html`
