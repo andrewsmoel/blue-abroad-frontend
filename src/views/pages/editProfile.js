@@ -11,7 +11,7 @@ class EditProfileView {
   init(){
     console.log('EditProfileView.init')
     document.title = 'Edit Profile'    
-    this.user = null
+    
     this.render()    
     Utils.pageIntroAnim()
     this.getUser()    
