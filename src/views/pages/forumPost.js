@@ -78,7 +78,8 @@ class forumPostView {
     
             if (!response.ok) throw new Error('Failed to delete post');
     
-            document.querySelector(`[data-post-id="${postId}"]`).remove();
+            // Redirect the user to the forums page
+            gotoRoute('/forums'); // or window.location.href = '/forums';
             console.log('Post deleted successfully');
         } catch (error) {
             console.error('Error deleting post:', error);
