@@ -1,6 +1,6 @@
 import App from './../../App'
-import {html, render } from 'lit-html'
-import {gotoRoute, anchorRoute} from './../../Router'
+import { html, render } from 'lit-html'
+import { gotoRoute, anchorRoute } from './../../Router'
 import Auth from './../../Auth'
 import Utils from './../../Utils'
 
@@ -28,180 +28,44 @@ class Comment {
     }
 }
 
-class ForumPostView {
+class forumPostView {
     async init() {
-        document.title = 'Forum Post';
+        document.title = 'Forum Post'
         // Get the post ID from the local storage
         const postId = localStorage.getItem('postId');
-        try {
-            // Fetch the post data from the server
-            this.postData = await this.getPostData(postId);
-            this.render();
-            Utils.pageIntroAnim();
-            console.log(this.postData);
-            this.renderPosts([this.postData]);
-        } catch (error) {
-            console.error('Error fetching post data:', error);
-        }
+        // Fetch the post data from the server
+        this.postData = await this.getPostData(postId);
+        this.render()    
+        Utils.pageIntroAnim()
+        console.log(this.postData)
+        this.renderPosts([this.postData]);
     }
 
     async getPostData(postId) {
-        try {
-            // Fetch the post data from the server
-            const response = await fetch(`https://asmoel-blueabroad-backend.onrender.com/post/${postId}`, {
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem('accessToken')
-                }
-            });
-
-            if (!response.ok) throw new Error('Failed to fetch post data');
-
-            const postData = await response.json();
-            console.log(postData.author);
-
-            // Fetch the author's data from the server
-            const authorData = await this.getAuthorData(postData.author);
-
-            // Concatenate the author's first name and last name to form the full name
-            postData.authorName = `${authorData.firstName} ${authorData.lastName}`;
-
-            // Add the author's avatar to the post data
-            postData.authorAvatar = `${App.apiBase}/images/${authorData.avatar}`;
-
-            return postData;
-        } catch (error) {
-            console.error('Error fetching post data:', error);
-            throw error;
-        }
-    }
-
-    async getAuthorData(authorId) {
-        try {
-            const response = await fetch(`https://asmoel-blueabroad-backend.onrender.com/user/${authorId}`, {
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem('accessToken')
-                }
-            });
-
-            if (!response.ok) throw new Error('Failed to fetch author data');
-
-            return await response.json();
-        } catch (error) {
-            console.error('Error fetching author data:', error);
-            throw error;
-        }
-    }
-
-    renderPosts(posts) {
-        const innerContainer = document.querySelector('.inner-cont');
-        if (!innerContainer) return;
-
-        posts.forEach(post => {
-            const postDiv = this.createPostElement(post);
-            innerContainer.appendChild(postDiv);
+        // Fetch the post data from the server
+        const response = await fetch(`https://asmoel-blueabroad-backend.onrender.com/post/${postId}`, {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem('accessToken')
+            }
         });
-    }
-
-    createPostElement(post) {
-        const postDiv = document.createElement('div');
-        postDiv.style.display = 'flex';
-        postDiv.style.justifyContent = 'space-between';
-        postDiv.style.alignItems = 'center';
-        postDiv.style.marginTop = '20px';
-
-        if (window.innerWidth <= 390) {
-            postDiv.style.paddingLeft = '0';
-            postDiv.style.fontSize = '12px';
-        } else {
-            postDiv.style.paddingLeft = '20px';
-            postDiv.style.fontSize = '16px';
-        }
-
-        const avatarDiv = this.createAvatarElement(post.authorAvatar);
-        const authorDiv = this.createAuthorElement(post.authorName);
-        const postBody = this.createPostBodyElement(post.bodyContent);
-        const replyLink = this.createReplyLink(post);
-        const deleteLink = this.createDeleteLink(post);
-
-        postDiv.appendChild(avatarDiv);
-        postDiv.appendChild(authorDiv);
-        postDiv.appendChild(postBody);
-        postDiv.appendChild(replyLink);
-
-        // Conditionally append the delete link if the current user is the author or has access level 2
-        if (post.author === Auth.currentUser._id || Auth.currentUser.accessLevel === 2) {
-            postDiv.appendChild(deleteLink);
-        }
-
-        return postDiv;
-    }
-
-    createAvatarElement(avatarUrl) {
-        const avatarDiv = document.createElement('div');
-        avatarDiv.className = 'avatar';
-
-        const slAvatar = document.createElement('sl-avatar');
-        slAvatar.style = '--size: 50px; padding-top: 1.5em; margin-bottom: 1em;';
-        slAvatar.setAttribute('image', avatarUrl);
-
-        avatarDiv.appendChild(slAvatar);
-        return avatarDiv;
-    }
-
-    createAuthorElement(authorName) {
-        const authorDiv = document.createElement('div');
-        authorDiv.textContent = authorName;
-        authorDiv.style.display = 'flex';
-        authorDiv.style.justifyContent = 'left';
-        return authorDiv;
-    }
-
-    createPostBodyElement(bodyContent) {
-        const postBody = document.createElement('div');
-        postBody.textContent = bodyContent;
-        return postBody;
-    }
-
-    createReplyLink(post) {
-        const replyLink = document.createElement('a');
-        replyLink.href = '#';
-        replyLink.textContent = 'Reply';
-        replyLink.style.marginRight = '20px';
-        replyLink.addEventListener('click', (event) => this.handleReplyClick(event, post));
-
-        return replyLink;
-    }
-
-    createDeleteLink(post) {
-        const deleteLink = document.createElement('a');
-        deleteLink.href = '#';
-        deleteLink.textContent = 'Delete';
-        deleteLink.style.marginRight = '20px';
-
-        deleteLink.addEventListener('click', (event) => this.handleDeleteClick(event, post._id));
-
-        return deleteLink;
-    }
-
-    handleReplyClick(event, post) {
-        event.preventDefault();
-
-        const postDiv = event.currentTarget.closest('div');
-        if (!postDiv.querySelector('sl-dialog')) {
-            const slDialog = this.createReplyDialog(post._id);
-            postDiv.appendChild(slDialog);
-            slDialog.show();
-        }
-    }
-
-    handleDeleteClick(event, postId) {
-        event.preventDefault();
-
-        // Confirm the deletion
-        if (confirm('Are you sure you want to delete this post?')) {
-            this.deletePost(postId);
-        }
-    }
+        const postData = await response.json();
+        console.log(postData.author);
+        // Fetch the author's data from the server
+        const authorResponse = await fetch(`https://asmoel-blueabroad-backend.onrender.com/user/${postData.author}`, {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem('accessToken')
+            }
+        });
+        const authorData = await authorResponse.json();
+        
+        // Concatenate the author's first name and last name to form the full name
+        postData.authorName = `${authorData.firstName} ${authorData.lastName}`;
+    
+        // Add the author's avatar to the post data
+        postData.authorAvatar = `${App.apiBase}/images/${authorData.avatar}`;
+    
+        return postData;
+    };
 
     async deletePost(postId) {
         try {
@@ -211,10 +75,9 @@ class ForumPostView {
                     "Authorization": "Bearer " + localStorage.getItem('accessToken')
                 }
             });
-
+    
             if (!response.ok) throw new Error('Failed to delete post');
-
-            // Remove the post from the DOM
+    
             document.querySelector(`[data-post-id="${postId}"]`).remove();
             console.log('Post deleted successfully');
         } catch (error) {
@@ -222,152 +85,254 @@ class ForumPostView {
         }
     }
 
-    createReplyDialog(postId) {
-        const slDialog = document.createElement('sl-dialog');
-        slDialog.setAttribute('label', 'Reply');
-        slDialog.classList.add('dialog-focus');
-        slDialog.style.color = '#222633';
+    renderPosts(posts) {
+        const innerContainer = document.querySelector('.inner-cont');
+        if (innerContainer) {
+            posts.forEach(async(post) => {
+                const postDiv = document.createElement('div');
+                postDiv.style.display = 'flex';
+                postDiv.style.justifyContent = 'space-between';
+                postDiv.style.alignItems = 'center';
+                postDiv.style.marginTop = '20px';
+                postDiv.dataset.postId = post._id; // Add this line to set the data attribute
 
-        const slInput = document.createElement('sl-input');
-        slInput.setAttribute('autofocus', '');
-        slInput.setAttribute('placeholder', 'Insert reply here');
-        slDialog.appendChild(slInput);
+                // Adjust the margin-left based on screen width
+                if (window.innerWidth <= 390) {
+                    postDiv.style.paddingLeft = '0'; // adjust size as needed
+                    postDiv.style.fontSize = '12px';
+                } else {
+                    postDiv.style.paddingLeft = '20px'; // reset to default
+                    postDiv.style.fontSize = '16px';
+                }
+            
+                // Create the avatar div
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = 'avatar';
 
-        const cancelButton = this.createCancelButton(slDialog);
-        const commentButton = this.createCommentButton(slDialog, slInput, postId);
+                // Create the sl-avatar element
+                const slAvatar = document.createElement('sl-avatar');
+                slAvatar.style = '--size: 50px; padding-top: 1.5em; margin-bottom: 1em;';
+                
+                // If the current user has an avatar, set the image property of the sl-avatar element
+                if (post.author) {
+                    const token = localStorage.getItem('accessToken'); // Replace 'token' with the key you use to store the token
+                    
+                    fetch(`${App.apiBase}/user/${post.author}`, {
+                        headers: {
+                            'Authorization': "Bearer " + token
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(author => {
+                        if (author && author.avatar) {
+                            const avatarUrl = `${App.apiBase}/images/${author.avatar}`;
+                             // Log the avatar URL
+                            slAvatar.setAttribute('image', avatarUrl);
+                        }
+                
+                        // Set the text content of the authorDiv to the author's name
+                        if (author && author.firstName && author.lastName) {
+                            authorDiv.textContent = `${author.firstName} ${author.lastName}`;
+                        }
+                    })
+                    .catch(err => console.error(err)); // Handle any errors
+                }
 
-        slDialog.appendChild(cancelButton);
-        slDialog.appendChild(commentButton);
+                // Append the sl-avatar element to the avatar div
+                avatarDiv.appendChild(slAvatar);
 
-        return slDialog;
+                // Append the avatar div to the postDiv
+                postDiv.appendChild(avatarDiv);
+
+                
+                // Create a new div for the author name
+                const authorDiv = document.createElement('div');
+                // Set the text content of the authorDiv to the author's name
+                authorDiv.textContent = post.authorName;
+                authorDiv.style.display = 'flex';
+                authorDiv.style.justifyContent = 'left';
+                
+                const postBody = document.createElement('div');
+                postBody.textContent = post.bodyContent;
+                authorDiv.style.display = 'flex';
+                authorDiv.style.justifyContent = 'left';
+                
+                postDiv.appendChild(authorDiv);
+                postDiv.appendChild(postBody);
+
+                // Create the reply anchor tag
+                const replyLink = document.createElement('a');
+                replyLink.href = '#';
+                replyLink.textContent = 'Reply';
+                replyLink.style.marginRight = '20px'; 
+                replyLink.addEventListener('click', (event) => {
+                    event.preventDefault();
+
+                    // Check if the sl-dialog element already exists
+                    if (!postDiv.querySelector('sl-dialog')) {
+                        // Create the sl-dialog element
+                        const slDialog = document.createElement('sl-dialog');
+                        slDialog.setAttribute('label', 'Reply');
+                        slDialog.classList.add('dialog-focus');
+                        slDialog.style.color = '#222633';
+
+                        // Create the sl-input element
+                        const slInput = document.createElement('sl-input');
+                        slInput.setAttribute('autofocus', '');
+                        slInput.setAttribute('placeholder', 'Insert reply here');
+                        slDialog.appendChild(slInput);
+
+                        // Create the cancel button in the dialog box
+                        const cancelButton = document.createElement('sl-button');
+                        cancelButton.setAttribute('slot', 'footer');
+                        cancelButton.setAttribute('variant', 'primary');
+                        cancelButton.textContent = 'Cancel';
+                        slDialog.appendChild(cancelButton);
+
+                        // Add event listeners to the sl-button elements
+                        cancelButton.addEventListener('click', () => {
+                            slDialog.hide();
+                            slDialog.remove(); // Add this line
+                        });
+
+                        const commentButton = document.createElement('sl-button');
+                        commentButton.setAttribute('slot', 'footer');
+                        commentButton.setAttribute('variant', 'primary');
+                        commentButton.textContent = 'Comment';
+                        slDialog.appendChild(commentButton);
+                        commentButton.style.fill = '#222633';
+                        
+                        // Create an instance of the Comment class
+                        const commentInstance = new Comment();
+
+                        // Event handler for the comment button
+                        commentButton.addEventListener('click', async () => {
+                            const postId = postDiv.getAttribute('postId', post._id); // Replace with the actual method to get the post ID
+                            const commentData = {
+                                author: localStorage.getItem('authorId'), // Replace with the actual method to get the author ID
+                                comment: slInput.value, // Get the comment from the sl-input element
+                                postId: postId,
+                            };
+                        
+                            try {
+                                const data = await commentInstance.addComment(postId, commentData);
+                                console.log(data);
+                        
+                                // Close the dialog box
+                                slDialog.hide();
+                            } catch (error) {
+                                console.error(error);
+                            }
+                        });
+
+                        // Append the sl-dialog element to the post div
+                        postDiv.appendChild(slDialog);
+
+                        // Add event listeners to the sl-button elements
+                        cancelButton.addEventListener('click', () => slDialog.hide());
+
+                        // Show the dialog
+                        slDialog.show();
+                    }
+                });
+
+                // Append the reply anchor tag to the post div
+                postDiv.appendChild(replyLink);
+
+                // Create the delete anchor tag
+                if (post.author === Auth.currentUser._id || Auth.currentUser.accessLevel === 2) {
+                    const deleteLink = document.createElement('a');
+                    deleteLink.href = '#';
+                    deleteLink.textContent = 'Delete';
+                    deleteLink.style.marginRight = '20px';
+
+                    deleteLink.addEventListener('click', (event) => {
+                        event.preventDefault();
+
+                        if (confirm('Are you sure you want to delete this post?')) {
+                            this.deletePost(post._id);
+                        }
+                    });
+
+                    postDiv.appendChild(deleteLink);
+                }
+
+                // Append the postDiv to the innerContainer
+                innerContainer.appendChild(postDiv);
+            });
+        }
     }
 
-    createCancelButton(slDialog) {
-        const cancelButton = document.createElement('sl-button');
-        cancelButton.setAttribute('slot', 'footer');
-        cancelButton.setAttribute('variant', 'primary');
-        cancelButton.textContent = 'Cancel';
-        cancelButton.addEventListener('click', () => {
-            slDialog.hide();
-            slDialog.remove();
-        });
-        return cancelButton;
-    }
-
-    createCommentButton(slDialog, slInput, postId) {
-        const commentButton = document.createElement('sl-button');
-        commentButton.setAttribute('slot', 'footer');
-        commentButton.setAttribute('variant', 'primary');
-        commentButton.textContent = 'Comment';
-        commentButton.style.fill = '#222633';
-
-        const commentInstance = new Comment();
-        commentButton.addEventListener('click', async () => {
-            const commentData = {
-                author: localStorage.getItem('authorId'),
-                comment: slInput.value,
-                postId: postId,
-            };
-
-            try {
-                const data = await commentInstance.addComment(postId, commentData);
-                console.log(data);
-                slDialog.hide();
-            } catch (error) {
-                console.error(error);
-            }
-        });
-        return commentButton;
-    }
-}
-
-
-
-
-
-
-            
-            
-            
-        
-
-    render(){
+    render() {
         const template = html`
         <style>
-        
-        h1 {
-            margin-left: 20%;
-        }
+            h1 {
+                margin-left: 20%;
+            }
 
-        .forums-container {
-            background-color: #EDEBEB;
-            margin-left: 20%;
-            margin-right: 20%;
-            border-radius: 15px;
-            display: flex;
-            flex-direction: column;
-            min-height: 80vh;
-        }
+            .forums-container {
+                background-color: #EDEBEB;
+                margin-left: 20%;
+                margin-right: 20%;
+                border-radius: 15px;
+                display: flex;
+                flex-direction: column;
+                min-height: 80vh;
+            }
 
-        .inner-cont {
-            background-color: #222633;
-            margin-top: 1em;
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-            height: 90%;
-            border-radius: 15px;
-            margin-left: 20px;
-            margin-right: 20px;
-            margin-bottom: 20px;
-            flex-grow: 1;
-        }
+            .inner-cont {
+                background-color: #222633;
+                margin-top: 1em;
+                display: flex;
+                flex-direction: column;
+                gap: 30px;
+                height: 90%;
+                border-radius: 15px;
+                margin-left: 20px;
+                margin-right: 20px;
+                margin-bottom: 20px;
+                flex-grow: 1;
+            }
 
-        .inner-cont div {
-            color: #F0F0F0;
-            padding-left: 20px;
-        }
+            .inner-cont div {
+                color: #F0F0F0;
+                padding-left: 20px;
+            }
 
+            @media screen and (max-width: 390px) {
+                body {
+                    overflow-x: hidden;
+                }
 
-        @media screen and (max-width: 390px) {
-            body {
-                overflow-x: hidden;
-              } 
+                h1 {
+                    margin-left: 2%;
+                }
 
-              h1 {
-                margin-left: 2%;
-              }
-            
-              .page-content {
-                justify-content: center;
-                align-items: center;
-                width: 100%;
-                overflow-x: hidden;
-              }
+                .page-content {
+                    justify-content: center;
+                    align-items: center;
+                    width: 100%;
+                    overflow-x: hidden;
+                }
 
-              .forums-container {
-                margin-left: 2%;
-                margin-right: 2%;
-                width: 350px;
-              }
-        }
-        
+                .forums-container {
+                    margin-left: 2%;
+                    margin-right: 2%;
+                    width: 350px;
+                }
+            }
         </style>
 
-
-
         <va-app-header user="${JSON.stringify(Auth.currentUser)}"></va-app-header>
-            <div class="page-content">                
+        <div class="page-content">                
             <h1>${this.postData.title}</h1>
             <div class="forums-container">
-                <div class="inner-cont">
-                    
-                
-                </div>
+                <div class="inner-cont"></div>
             </div>
-            </div>
+        </div>
         `
         render(template, App.rootEl)
     }
 }
+
 export default new forumPostView()
