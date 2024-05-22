@@ -119,7 +119,7 @@ class forumPostView {
                     
                     fetch(`${App.apiBase}/user/${post.author}`, {
                         headers: {
-                            'Authorization': "Bearer " + token
+                            'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
                         }
                     })
                     .then(response => response.json())
