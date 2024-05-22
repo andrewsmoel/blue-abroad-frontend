@@ -1,6 +1,6 @@
 import App from './../../App'
-import { html, render } from 'lit-html'
-import { gotoRoute, anchorRoute } from './../../Router'
+import {html, render } from 'lit-html'
+import {gotoRoute, anchorRoute} from './../../Router'
 import Auth from './../../Auth'
 import Utils from './../../Utils'
 
@@ -58,6 +58,7 @@ class forumPostView {
         });
         const authorData = await authorResponse.json();
         
+    
         // Concatenate the author's first name and last name to form the full name
         postData.authorName = `${authorData.firstName} ${authorData.lastName}`;
     
@@ -67,35 +68,19 @@ class forumPostView {
         return postData;
     };
 
-    async deletePost(postId) {
-        try {
-            const response = await fetch(`https://asmoel-blueabroad-backend.onrender.com/post/${postId}`, {
-                method: 'DELETE',
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem('accessToken')
-                }
-            });
-    
-            if (!response.ok) throw new Error('Failed to delete post');
-    
-            document.querySelector(`[data-post-id="${postId}"]`).remove();
-            console.log('Post deleted successfully');
-        } catch (error) {
-            console.error('Error deleting post:', error);
-        }
-    }
+
+
 
     renderPosts(posts) {
         const innerContainer = document.querySelector('.inner-cont');
         if (innerContainer) {
-            posts.forEach(async(post) => {
+            posts.forEach((post) => {
                 const postDiv = document.createElement('div');
                 postDiv.style.display = 'flex';
                 postDiv.style.justifyContent = 'space-between';
                 postDiv.style.alignItems = 'center';
                 postDiv.style.marginTop = '20px';
-                postDiv.dataset.postId = post._id; // Add this line to set the data attribute
-
+                
                 // Adjust the margin-left based on screen width
                 if (window.innerWidth <= 390) {
                     postDiv.style.paddingLeft = '0'; // adjust size as needed
@@ -112,14 +97,15 @@ class forumPostView {
                 // Create the sl-avatar element
                 const slAvatar = document.createElement('sl-avatar');
                 slAvatar.style = '--size: 50px; padding-top: 1.5em; margin-bottom: 1em;';
-                
+
+               
                 // If the current user has an avatar, set the image property of the sl-avatar element
                 if (post.author) {
                     const token = localStorage.getItem('accessToken'); // Replace 'token' with the key you use to store the token
                     
                     fetch(`${App.apiBase}/user/${post.author}`, {
                         headers: {
-                            'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+                            'Authorization': "Bearer " + token
                         }
                     })
                     .then(response => response.json())
@@ -152,10 +138,13 @@ class forumPostView {
                 authorDiv.style.display = 'flex';
                 authorDiv.style.justifyContent = 'left';
                 
+                
+
                 const postBody = document.createElement('div');
                 postBody.textContent = post.bodyContent;
                 authorDiv.style.display = 'flex';
                 authorDiv.style.justifyContent = 'left';
+                
                 
                 postDiv.appendChild(authorDiv);
                 postDiv.appendChild(postBody);
@@ -239,100 +228,98 @@ class forumPostView {
                 // Append the reply anchor tag to the post div
                 postDiv.appendChild(replyLink);
 
-                // Create the delete anchor tag
-                if (post.author === Auth.currentUser._id || Auth.currentUser.accessLevel === 2) {
-                    const deleteLink = document.createElement('a');
-                    deleteLink.href = '#';
-                    deleteLink.textContent = 'Delete';
-                    deleteLink.style.marginRight = '20px';
-
-                    deleteLink.addEventListener('click', (event) => {
-                        event.preventDefault();
-
-                        if (confirm('Are you sure you want to delete this post?')) {
-                            this.deletePost(post._id);
-                        }
-                    });
-
-                    postDiv.appendChild(deleteLink);
-                }
-
                 // Append the postDiv to the innerContainer
                 innerContainer.appendChild(postDiv);
             });
         }
     }
 
-    render() {
+
+
+
+
+            
+            
+            
+        
+
+    render(){
         const template = html`
         <style>
-            h1 {
-                margin-left: 20%;
-            }
+        
+        h1 {
+            margin-left: 20%;
+        }
 
-            .forums-container {
-                background-color: #EDEBEB;
-                margin-left: 20%;
-                margin-right: 20%;
-                border-radius: 15px;
-                display: flex;
-                flex-direction: column;
-                min-height: 80vh;
-            }
+        .forums-container {
+            background-color: #EDEBEB;
+            margin-left: 20%;
+            margin-right: 20%;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            min-height: 80vh;
+        }
 
-            .inner-cont {
-                background-color: #222633;
-                margin-top: 1em;
-                display: flex;
-                flex-direction: column;
-                gap: 30px;
-                height: 90%;
-                border-radius: 15px;
-                margin-left: 20px;
-                margin-right: 20px;
-                margin-bottom: 20px;
-                flex-grow: 1;
-            }
+        .inner-cont {
+            background-color: #222633;
+            margin-top: 1em;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            height: 90%;
+            border-radius: 15px;
+            margin-left: 20px;
+            margin-right: 20px;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
 
-            .inner-cont div {
-                color: #F0F0F0;
-                padding-left: 20px;
-            }
+        .inner-cont div {
+            color: #F0F0F0;
+            padding-left: 20px;
+        }
 
-            @media screen and (max-width: 390px) {
-                body {
-                    overflow-x: hidden;
-                }
 
-                h1 {
-                    margin-left: 2%;
-                }
+        @media screen and (max-width: 390px) {
+            body {
+                overflow-x: hidden;
+              } 
 
-                .page-content {
-                    justify-content: center;
-                    align-items: center;
-                    width: 100%;
-                    overflow-x: hidden;
-                }
+              h1 {
+                margin-left: 2%;
+              }
+            
+              .page-content {
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+                overflow-x: hidden;
+              }
 
-                .forums-container {
-                    margin-left: 2%;
-                    margin-right: 2%;
-                    width: 350px;
-                }
-            }
+              .forums-container {
+                margin-left: 2%;
+                margin-right: 2%;
+                width: 350px;
+              }
+        }
+        
         </style>
 
+
+
         <va-app-header user="${JSON.stringify(Auth.currentUser)}"></va-app-header>
-        <div class="page-content">                
+            <div class="page-content">                
             <h1>${this.postData.title}</h1>
             <div class="forums-container">
-                <div class="inner-cont"></div>
+                <div class="inner-cont">
+                    
+                
+                </div>
             </div>
-        </div>
+            </div>
         `
         render(template, App.rootEl)
     }
 }
-
 export default new forumPostView()
